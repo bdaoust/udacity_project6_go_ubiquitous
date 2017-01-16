@@ -32,6 +32,8 @@ dependencies {
 
     compile 'com.firebase:firebase-jobdispatcher:0.5.0'
 
+    wearApp project(':wear')
+
     // Instrumentation dependencies use androidTestCompile
     // (as opposed to testCompile for local unit tests run in the JVM)
     androidTestCompile 'junit:junit:4.12'
