@@ -18,6 +18,9 @@ package com.example.android.sunshine.sync;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.format.DateUtils;
 
 import com.example.android.sunshine.data.SunshinePreferences;
@@ -25,10 +28,28 @@ import com.example.android.sunshine.data.WeatherContract;
 import com.example.android.sunshine.utilities.NetworkUtils;
 import com.example.android.sunshine.utilities.NotificationUtils;
 import com.example.android.sunshine.utilities.OpenWeatherJsonUtils;
+import com.example.android.sunshine.utilities.SunshineWeatherUtils;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.wearable.DataMap;
+import com.google.android.gms.wearable.PutDataMapRequest;
+import com.google.android.gms.wearable.PutDataRequest;
+import com.google.android.gms.wearable.Wearable;
 
 import java.net.URL;
 
 public class SunshineSyncTask {
+
+    /*
+     * Note: The choice of using a static GoogleApiClient inside SunshineSyncTask is
+     * based on a suggestion provided in the Udacity Discussion Forum:
+     * https://discussions.udacity.com/t/making-the-googleclientapi-object-private-outside-static-sync-method/208406
+     */
+    private static GoogleApiClient mGoogleApiClient;
+
+    private static int mMinTemp;
+    private static int mMaxTemp;
+    private static String mWeatherConditionKey;
 
     /**
      * Performs the network request for updated weather, parses the JSON from that request, and
@@ -38,7 +59,28 @@ public class SunshineSyncTask {
      *
      * @param context Used to access utility methods and the ContentResolver
      */
-    synchronized public static void syncWeather(Context context) {
+    synchronized public static void syncWeather(final Context context) {
+        ContentValues todayWeatherValues;
+        int weatherId;
+
+        mGoogleApiClient = new GoogleApiClient.Builder(context)
+                .addApi(Wearable.API)
+                .addOnConnectionFailedListener(new GoogleApiClient.OnConnectionFailedListener() {
+                    @Override
+                    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+                    }
+                })
+                .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
+                    @Override
+                    public void onConnected(@Nullable Bundle bundle) {
+                        sendWeatherDataToAndroidWear(mGoogleApiClient);
+                    }
+
+                    @Override
+                    public void onConnectionSuspended(int i) {
+                    }
+                }).build();
+
 
         try {
             /*
@@ -70,6 +112,17 @@ public class SunshineSyncTask {
                         WeatherContract.WeatherEntry.CONTENT_URI,
                         null,
                         null);
+
+                /* Get the min temperature, max temparature, and weather conditions for today*/
+                todayWeatherValues = weatherValues[0];
+                weatherId = todayWeatherValues.getAsInteger("weather_id");
+                mMinTemp = Math.round(todayWeatherValues.getAsFloat("min"));
+                mMaxTemp = Math.round(todayWeatherValues.getAsFloat("max"));
+                mWeatherConditionKey = SunshineWeatherUtils.getWeatherKeyForAndroidWear(weatherId);
+
+                /* Connect to Google Api Client. Once the connection is successful, today's weather data
+                *  will be sent to Android Wear*/
+                mGoogleApiClient.connect();
 
                 /* Insert our new weather data into Sunshine's ContentProvider */
                 sunshineContentResolver.bulkInsert(
@@ -113,4 +166,21 @@ public class SunshineSyncTask {
             e.printStackTrace();
         }
     }
+
+    private static void sendWeatherDataToAndroidWear(GoogleApiClient googleApiClient){
+        PutDataMapRequest putDataMapRequest;
+        PutDataRequest putDataRequest;
+        DataMap dataMap;
+
+        putDataMapRequest = PutDataMapRequest.create("/sunshine-weather");
+        dataMap = putDataMapRequest.getDataMap();
+        dataMap.putInt("MIN_TEMP", mMinTemp);
+        dataMap.putInt("MAX_TEMP", mMaxTemp);
+        dataMap.putString("WEATHER_KEY",mWeatherConditionKey);
+        putDataRequest = putDataMapRequest.asPutDataRequest();
+        Wearable.DataApi.putDataItem(googleApiClient, putDataRequest);
+
+        googleApiClient.disconnect();
+    }
+
 }

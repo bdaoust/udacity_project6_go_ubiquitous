@@ -365,6 +365,53 @@ public final class SunshineWeatherUtils {
     }
 
     /**
+     * Helper method to provide the key used in the Android wear module which corresponds to a given
+     * weather condition id returned by the OpenWeatherMap call.
+     *
+     * This method is based on
+     *
+     *   {@link #getSmallArtResourceIdForWeatherCondition(int)}.
+     *
+     * @param weatherId from OpenWeatherMap API response
+     *                  See http://openweathermap.org/weather-conditions for a list of all IDs
+     *
+     * @return key used in Android wear for the corresponding weather condition
+     */
+    public static String getWeatherKeyForAndroidWear(int weatherId) {
+        if (weatherId >= 200 && weatherId <= 232) {
+            return "weather_storm";
+        } else if (weatherId >= 300 && weatherId <= 321) {
+            return "weather_light_rain";
+        } else if (weatherId >= 500 && weatherId <= 504) {
+            return "weather_rain";
+        } else if (weatherId == 511) {
+            return "weather_snow";
+        } else if (weatherId >= 520 && weatherId <= 531) {
+            return "weather_rain";
+        } else if (weatherId >= 600 && weatherId <= 622) {
+            return "weather_snow";
+        } else if (weatherId >= 701 && weatherId <= 761) {
+            return "weather_fog";
+        } else if (weatherId == 761 || weatherId == 771 || weatherId == 781) {
+            return "weather_storm";
+        } else if (weatherId == 800) {
+            return "weather_clear";
+        } else if (weatherId == 801) {
+            return "weather_light_clouds";
+        } else if (weatherId >= 802 && weatherId <= 804) {
+            return "weather_cloudy";
+        } else if (weatherId >= 900 && weatherId <= 906) {
+            return "weather_storm";
+        } else if (weatherId >= 958 && weatherId <= 962) {
+            return "weather_storm";
+        } else if (weatherId >= 951 && weatherId <= 957) {
+            return "weather_clear";
+        }
+
+        return "weather_storm";
+    }
+
+    /**
      * Helper method to provide the art resource ID according to the weather condition ID returned
      * by the OpenWeatherMap call. This method is very similar to
      *

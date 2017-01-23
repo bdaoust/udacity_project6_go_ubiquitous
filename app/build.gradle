@@ -32,6 +32,9 @@ dependencies {
 
     compile 'com.firebase:firebase-jobdispatcher:0.5.0'
 
+    compile 'com.google.android.support:wearable:2.0.0-beta1'
+    compile 'com.google.android.gms:play-services-wearable:10.0.1'
+
     wearApp project(':wear')
 
     // Instrumentation dependencies use androidTestCompile
