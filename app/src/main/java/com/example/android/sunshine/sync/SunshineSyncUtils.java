@@ -38,7 +38,7 @@ public class SunshineSyncUtils {
      * Interval at which to sync with the weather. Use TimeUnit for convenience, rather than
      * writing out a bunch of multiplication ourselves and risk making a silly mistake.
      */
-    private static final int SYNC_INTERVAL_HOURS = 3;
+    private static final int SYNC_INTERVAL_HOURS = 1;
     private static final int SYNC_INTERVAL_SECONDS = (int) TimeUnit.HOURS.toSeconds(SYNC_INTERVAL_HOURS);
     private static final int SYNC_FLEXTIME_SECONDS = SYNC_INTERVAL_SECONDS / 3;
 
@@ -79,7 +79,7 @@ public class SunshineSyncUtils {
                  */
                 .setRecurring(true)
                 /*
-                 * We want the weather data to be synced every 3 to 4 hours. The first argument for
+                 * We want the weather data to be synced every 60 to 80 minutes. The first argument for
                  * Trigger's static executionWindow method is the start of the time frame when the
                  * sync should be performed. The second argument is the latest point in time at
                  * which the data should be synced. Please note that this end time is not

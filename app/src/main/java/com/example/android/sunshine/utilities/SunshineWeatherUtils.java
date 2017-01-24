@@ -408,7 +408,7 @@ public final class SunshineWeatherUtils {
             return "weather_clear";
         }
 
-        return "weather_storm";
+        return "weather_default";
     }
 
     /**

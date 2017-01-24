@@ -113,7 +113,7 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
         Paint mHighTempTextPaint;
         Paint mLowTempTextPaint;
 
-        String mCurrentWeather = KEY_WEATHER_CLEAR;
+        String mCurrentWeather = KEY_WEATHER_DEFAULT;
         int mHighTemp;
         int mLowTemp;
 
@@ -137,6 +137,7 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
         float mYBaseOffset;
 
         HashMap<String,Bitmap> mWeatherIcons;
+        static final String KEY_WEATHER_DEFAULT = "weather_default";
         static final String KEY_WEATHER_CLEAR = "weather_clear";
         static final String KEY_WEATHER_CLOUDY = "weather_cloudy";
         static final String KEY_WEATHER_FOG = "weather_fog";
@@ -184,6 +185,7 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
             mCalendar = Calendar.getInstance();
 
             mWeatherIcons = new HashMap<>();
+            mWeatherIcons.put(KEY_WEATHER_DEFAULT, BitmapFactory.decodeResource(resources, R.drawable.ic_default));
             mWeatherIcons.put(KEY_WEATHER_CLEAR, BitmapFactory.decodeResource(resources, R.drawable.ic_clear));
             mWeatherIcons.put(KEY_WEATHER_CLOUDY, BitmapFactory.decodeResource(resources, R.drawable.ic_cloudy));
             mWeatherIcons.put(KEY_WEATHER_FOG, BitmapFactory.decodeResource(resources, R.drawable.ic_fog));
